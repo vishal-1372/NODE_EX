@@ -1,0 +1,87 @@
+install command
+npm init -y
+npm i nodemon
+npm i express
+npm i mongoo
+
+index.js
+---------------------------------------------------------------------------------------------------------------------------------------------
+const express = require('express')
+const mongoose = require('mongoose')
+const router = require('./route/route')
+
+const connectDB = async ()=>{
+
+    const connection = await mongoose.connect("mongodb+srv://mvishal287:Lou9HjvV4dTjJmGb@cluster0.4aikj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",{})
+    console.log("mongos connected")
+}
+
+connectDB()
+
+const app = express()
+app.use(express.json())
+app.use('/vishal',router);
+
+app.listen(7878,()=>{
+    console.log("port 7878 is running");
+})
+======================================================================================================
+
+
+
+controller.js
+-------------------------------------------------------------------------------------------------------------------------------
+const Users = require('./../model/model');
+
+exports.index =async (req,res) =>{
+    const data = await Users.find()
+    res.json(data);
+}
+exports.store = async (req,res) =>{
+    const data = await Users.create(req.body);
+    res.send("data inserted");
+}
+exports.delete = async (req,res)=>{
+    const data = await Users.findByIdAndDelete(req.body._id)
+    res.send("Data Deleted");
+}
+exports.update = async (req,res)=>{
+    const data = await Users.findByIdAndUpdate(req.body._id,req.body)
+    res.send("Data Updated");
+}
+==============================================================================================
+
+model.js
+----------------------------------------------------------------------------------------------------------------------------------
+const mongoose = require('mongoose')
+
+const User = new mongoose.Schema({
+
+    name:{
+        type:String,
+    },
+    rollno:{
+        type:Number,
+    }
+})
+
+const Users = mongoose.model("User",User)
+
+module.exports = Users;
+
+=============================================================================================================
+
+route.js
+-------------------------------------------------------------------------------------------------------------------------------------------
+const express = require('express')
+const controller = require('./../controller/controller')
+
+const router = express.Router();
+
+
+router.get('/',controller.index);
+router.post('/',controller.store);
+router.delete('/',controller.delete);
+router.put('/',controller.update);
+
+module.exports=router
